@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
+import java.util.Date;
 import java.util.List;
 
 import io.lattis.hitme.model.ChatBox;
@@ -114,10 +115,11 @@ public class ConversationFragment extends Fragment {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
+
             holder.speakerView.setText(mValues.get(position).getSpeaker());
             holder.msgView.setText(mValues.get(position).getMessage());
-            holder.dateView.setText(mValues.get(position).getTimeSent());
-            holder.timeView.setText(mValues.get(position).getTimeSent());
+            holder.dateView.setText(QueryUtils.formatDate(new Date(Long.parseLong(mValues.get(position).getTimeSent()))));
+            holder.timeView.setText(QueryUtils.formatTime(new Date(Long.parseLong(mValues.get(position).getTimeSent()))));
 
         }
 
@@ -173,7 +175,7 @@ public class ConversationFragment extends Fragment {
                     final ChatBox chatMessage = new ChatBox();
                     chatMessage.setSpeaker("Me");
                     chatMessage.setMessage(message);
-                    chatMessage.setTimeSent(QueryUtils.getCurrentDate());
+                    chatMessage.setTimeSent(String.valueOf(System.currentTimeMillis()));
                     msg_edittext.setText("");
 
                     realm.executeTransaction(new Realm.Transaction() {

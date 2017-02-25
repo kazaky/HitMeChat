@@ -32,6 +32,7 @@ import io.realm.RealmResults;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
+
 public class ContactListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<ChatNode>> {
 
     /**
