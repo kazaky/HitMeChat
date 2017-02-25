@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import io.lattis.hitme.model.ChatNode;
+import io.realm.Realm;
 
 
 /**
@@ -28,7 +29,9 @@ public class ContactDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private ChatNode mItem;
+    private String contactName;
+    private String mTitle;
+    private Realm realm;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -40,17 +43,35 @@ public class ContactDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        realm = Realm.getDefaultInstance();
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            // mItem = ChatNode.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+
+            contactName = getArguments().getString(ARG_ITEM_ID);
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.getContact());
+
+
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        ChatNode firstChatNodes = realm.where(ChatNode.class)
+                                .beginsWith("contact", contactName)
+                                .findFirst();
+
+                        mTitle = firstChatNodes.getChatBox().get(0).getMessage();
+                        //    for (ChatNode someChat : allChatNodes) {
+                        //       Log.d("TAG", "onCreate: " + someChat.getContact());
+                        //   }
+                    }
+                });
+
+                appBarLayout.setTitle(mTitle);
             }
         }
     }
@@ -61,10 +82,16 @@ public class ContactDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.contact_detail, container, false);
 
         // Show the dummy content as text in a TextView.
-        if (mItem != null) {
-          //  ((TextView) rootView.findViewById(R.id.contact_detail)).setText(mItem.details);
+        if (mTitle != null) {
+            ((TextView) rootView.findViewById(R.id.contact_detail)).setText(mTitle);
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 }
