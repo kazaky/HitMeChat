@@ -59,7 +59,10 @@ public class ChatLoader extends AsyncTaskLoader<List<ChatNode>> {
         // Perform the network request, parse the response, and extract a list of earthquakes.
         List<ChatNode> earthquakesResult = null;
         try {
-            QueryUtils.fetchChatData(mUrl);
+
+            if (!ContactListActivity.previouslyLoaded) {
+                QueryUtils.fetchChatData(mUrl);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

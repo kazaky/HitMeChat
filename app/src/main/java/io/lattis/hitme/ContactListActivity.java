@@ -2,6 +2,7 @@ package io.lattis.hitme;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -41,49 +42,52 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
     public static final String TAG = ContactListActivity.class.getName();
 
 
-    private static final int EARTHQUAKE_LOADER_ID = 1;
+    private static final int CHAT_LOADER_ID = 1;
 
 
     private static final String API_REQUEST_URL
             = "http://hitme-dev.us-west-2.elasticbeanstalk.com/api/all-messages";
 
-
-    private TextView mEmptyStateTextView;
     private Realm realm;
     private View recyclerView;
-
+    public static boolean previouslyLoaded = false;
+    private SharedPreferences sharedPref;
+    private TextView mEmptyStateTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
+        realm = Realm.getDefaultInstance();
 
 
         recyclerView = findViewById(R.id.contact_list);
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
         assert recyclerView != null;
 
 
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            LoaderManager loaderManager = getSupportLoaderManager();
-            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
-            Log.e(TAG, "onCreate, initLoader: ");
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        previouslyLoaded = sharedPref.getBoolean("saved_before", false);
 
+        if (!previouslyLoaded) {
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                LoaderManager loaderManager = getSupportLoaderManager();
+                loaderManager.initLoader(CHAT_LOADER_ID, null, this);
+                Log.e(TAG, "onCreate, initLoader: ");
+
+            } else {
+                View loadingIndicator = findViewById(R.id.loading_indicator);
+                loadingIndicator.setVisibility(View.GONE);
+
+                mEmptyStateTextView.setText("no_internet_connection");
+            }
         } else {
-            View loadingIndicator = findViewById(R.id.loading_indicator);
-            loadingIndicator.setVisibility(View.GONE);
-
-            mEmptyStateTextView.setText("no_internet_connection");
-
+            loadFromDatabase();
         }
-
-
-        realm = Realm.getDefaultInstance();
-
     }
-
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<ChatNode> contacts) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(contacts));
     }
@@ -107,7 +111,6 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            // holder.mIdView.setText(mValues.get(position).id);
             holder.mContact.setText(mValues.get(position).getContact());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -161,12 +164,10 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
     @Override
     public Loader<List<ChatNode>> onCreateLoader(int id, Bundle args) {
         Log.e(TAG, "onCreateLoader: ");
-
-
-        Uri baseUri = Uri.parse(API_REQUEST_URL);
-        Uri.Builder uriBuilder = baseUri.buildUpon();
-        // Create a new loader for the given URL
-        return new ChatLoader(this, uriBuilder.toString());
+            Uri baseUri = Uri.parse(API_REQUEST_URL);
+            Uri.Builder uriBuilder = baseUri.buildUpon();
+            // Create a new loader for the given URL
+            return new ChatLoader(this, uriBuilder.toString());
 
     }
 
@@ -178,20 +179,29 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
         View loadingIndicator = findViewById(R.id.loading_indicator);
         loadingIndicator.setVisibility(View.GONE);
 
-        // Set empty state text to display "No earthquakes found."
-        //  mEmptyStateTextView.setText(R.string.no_earthquakes);
+        loadFromDatabase();
+    }
 
-        // Clear the adapter of previous earthquake data
-        // adapter.clear();
-
+    private void loadFromDatabase() {
         RealmResults<ChatNode> allChatNodes = realm.where(ChatNode.class)
                 .findAll();
+
+
         for (ChatNode someChat : allChatNodes) {
+            if (!someChat.getContact().isEmpty()) {
+                sharedPref = getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("saved_before", true);
+                editor.commit();
+
+            }
             Log.d(TAG, "onCreate: " + someChat.getContact());
         }
 
-
         setupRecyclerView((RecyclerView) recyclerView, allChatNodes);
+
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.GONE);
 
     }
 
@@ -200,7 +210,7 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
         Log.e(TAG, "onLoaderReset: ");
         // Loader reset, so we can clear out our existing data.
 
-        // adapter.clear();
+        //adapter.clear();
 
     }
 
