@@ -28,6 +28,25 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <include layout="@layout/contact_list" />
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:id="@+id/loading_indicator"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+        <!-- Empty view is only visible when the list has no items. -->
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/empty_view"
+            android:textColor="#4e4e4e"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textAppearance="?android:textAppearanceMedium"/>
+
+
     </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -38,20 +57,6 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
-    <!-- Empty view is only visible when the list has no items. -->
-    <TextView
-        android:id="@+id/empty_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textAppearance="?android:textAppearanceMedium"/>
 
-    <!-- Loading indicator is only shown before the first load -->
-    <ProgressBar
-        android:id="@+id/loading_indicator"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -138,8 +138,8 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(ContactDetailFragment.ARG_ITEM_ID, holder.mItem.getContact());
-                        ContactDetailFragment fragment = new ContactDetailFragment();
+                        arguments.putString(ConversationFragment.ARG_ITEM_ID, holder.mItem.getContact());
+                        ConversationFragment fragment = new ConversationFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.contact_detail_container, fragment)
@@ -147,7 +147,7 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, ContactDetailActivity.class);
-                        intent.putExtra(ContactDetailFragment.ARG_ITEM_ID, holder.mItem.getContact());
+                        intent.putExtra(ConversationFragment.ARG_ITEM_ID, holder.mItem.getContact());
 
                         context.startActivity(intent);
                     }
