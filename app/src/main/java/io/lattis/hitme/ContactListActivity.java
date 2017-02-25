@@ -54,6 +54,8 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
     public static boolean previouslyLoaded = false;
     private SharedPreferences sharedPref;
     private TextView mEmptyStateTextView;
+    private SimpleItemRecyclerViewAdapter adapter;
+    private RealmResults<ChatNode> allChatNodes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +92,11 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
         }
     }
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<ChatNode> contacts) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(contacts));
+
+         adapter = new SimpleItemRecyclerViewAdapter(contacts);
+
+
+        recyclerView.setAdapter(adapter);
     }
 
     public class SimpleItemRecyclerViewAdapter
@@ -184,7 +190,7 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
     }
 
     private void loadFromDatabase() {
-        RealmResults<ChatNode> allChatNodes = realm.where(ChatNode.class)
+         allChatNodes = realm.where(ChatNode.class)
                 .findAll();
 
 
@@ -211,7 +217,8 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
         Log.e(TAG, "onLoaderReset: ");
         // Loader reset, so we can clear out our existing data.
 
-        //adapter.clear();
+        allChatNodes.clear();
+        adapter.notifyDataSetChanged();
 
     }
 

@@ -11,10 +11,6 @@ import java.util.List;
 import io.lattis.hitme.model.ChatNode;
 import io.lattis.hitme.utils.QueryUtils;
 
-/**
- * Loads a list of earthquakes by using an AsyncTask to perform the
- * network request to the given URL.
- */
 public class ChatLoader extends AsyncTaskLoader<List<ChatNode>> {
 
     /**
@@ -56,8 +52,7 @@ public class ChatLoader extends AsyncTaskLoader<List<ChatNode>> {
             return null;
         }
 
-        // Perform the network request, parse the response, and extract a list of earthquakes.
-        List<ChatNode> earthquakesResult = null;
+        List<ChatNode> Result = null;
         try {
 
             if (!ContactListActivity.previouslyLoaded) {
@@ -66,6 +61,6 @@ public class ChatLoader extends AsyncTaskLoader<List<ChatNode>> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return earthquakesResult;
+        return Result;
     }
 }

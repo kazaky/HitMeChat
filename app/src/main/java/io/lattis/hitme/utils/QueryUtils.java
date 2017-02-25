@@ -1,5 +1,7 @@
 package io.lattis.hitme.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -35,7 +37,7 @@ public final class QueryUtils {
     }
 
     public static void fetchChatData(String requestUrl) throws JSONException {
-        Log.e(TAG, "fetchEarthquakeData: ");
+        Log.e(TAG, "fetchChatData: ");
 
         // Testing Indeterminant ProgressBar
         try {
@@ -66,7 +68,6 @@ public final class QueryUtils {
 
         // Beware of static
         realm = Realm.getDefaultInstance();
-        // TODO Close realm!!
 
 
         final JSONObject fullResponse = new JSONObject(response);
@@ -97,15 +98,11 @@ public final class QueryUtils {
                             chatNode.getChatBox().add(currentChatBox);
                         }
 
-
                     }
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
             }
 
 
@@ -113,10 +110,7 @@ public final class QueryUtils {
         });
 
 
-
-
     }
-
 
     /**
      * Returns new URL object from the given string URL.
