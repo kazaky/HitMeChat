@@ -149,14 +149,12 @@ public class ContactListActivity extends AppCompatActivity implements LoaderMana
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
-            public final TextView mIdView;
             public final TextView mContact;
             public ChatNode mItem;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
                 mContact = (TextView) view.findViewById(R.id.contact);
             }
 
