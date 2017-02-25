@@ -1,4 +1,4 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,22 +7,14 @@
     tools:context="io.lattis.hitme.ContactDetailActivity">
 
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/detail_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        app:layout_collapseMode="pin"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-    <android.support.v4.widget.NestedScrollView
+    <FrameLayout
         android:id="@+id/contact_detail_container"
         android:layout_width="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_height="match_parent"
+
+        android:background="#e1e1e1"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
-
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>
 

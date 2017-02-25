@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.lattis.hitme">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -13,8 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ContactListActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:label="Contacts">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,9 +23,8 @@
         </activity>
         <activity
             android:name=".ContactDetailActivity"
-            android:label="@string/title_contact_detail"
-            android:parentActivityName=".ContactListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:label="Chat"
+            android:parentActivityName=".ContactListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="io.lattis.hitme.ContactListActivity" />

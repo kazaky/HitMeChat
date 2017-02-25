@@ -1,25 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="io.lattis.hitme.ContactListActivity">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -30,33 +16,24 @@
         <include layout="@layout/contact_list" />
 
         <ProgressBar
-            android:layout_gravity="center"
             android:id="@+id/loading_indicator"
             style="@style/Widget.AppCompat.ProgressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true"
+            android:layout_gravity="center" />
         <!-- Empty view is only visible when the list has no items. -->
         <TextView
-            android:layout_gravity="center"
             android:id="@+id/empty_view"
-            android:textColor="#4e4e4e"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textAppearance="?android:textAppearanceMedium"/>
+            android:layout_gravity="center"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="#4e4e4e" />
 
 
     </FrameLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
 
-
-
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>
