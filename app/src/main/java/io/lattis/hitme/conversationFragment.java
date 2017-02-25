@@ -2,20 +2,26 @@ package io.lattis.hitme;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import io.lattis.hitme.model.ChatBox;
 import io.lattis.hitme.model.ChatNode;
+import io.lattis.hitme.utils.QueryUtils;
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class ConversationFragment extends Fragment {
 
@@ -28,7 +34,11 @@ public class ConversationFragment extends Fragment {
     private String contactName;
 
     private Realm realm;
-    private View recyclerView;
+    private RecyclerView recyclerView;
+    private static SimpleItemRecyclerViewAdapter adapter;
+    private ChatNode currentChatNodes;
+    private RealmResults<ChatBox> senderOnlyNodes;
+    private RealmList<ChatBox> allChatNodes;
 
     public ConversationFragment() {
     }
@@ -44,25 +54,45 @@ public class ConversationFragment extends Fragment {
 
             realm = Realm.getDefaultInstance();
 
+            currentChatNodes = realm.where(ChatNode.class)
+                    .beginsWith("contact", contactName)
+                    .findFirst();
+            senderOnlyNodes = realm.where(ChatBox.class)
+                    .beginsWith("speaker", contactName).findAll();
+            allChatNodes = currentChatNodes.getChatBox();
 
-            //  CollapsingToolbarLayout appBarLayout =
-            //        (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            //if (appBarLayout != null) {
-
-            // mTitle = firstChatNodes.getChatBox().get(0).getMessage();
-            //    for (ChatNode someChat : allChatNodes) {
-            //       Log.d("TAG", "onCreate: " + someChat.getContact());
-            //   }
-
-            // appBarLayout.setTitle(mTitle);
-            //    }
         }
     }
 
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<ChatBox> msgs) {
+    private static class MyHandler extends Handler {
+    }
 
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(msgs));
+    private final MyHandler mHandler = new MyHandler();
+
+    public static class MyRunnable implements Runnable {
+        private final WeakReference<Activity> mActivity;
+
+        public MyRunnable(Activity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void run() {
+            Activity activity = mActivity.get();
+            if (activity != null) {
+                adapter.notifyDataSetChanged();
+
+            }
+        }
+    }
+
+    private MyRunnable mRunnable = new MyRunnable(getActivity());
+
+
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<ChatBox> msgs) {
+        adapter = new SimpleItemRecyclerViewAdapter(msgs);
+        recyclerView.setAdapter(adapter);
     }
 
     public class SimpleItemRecyclerViewAdapter
@@ -126,14 +156,62 @@ public class ConversationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.contact_detail, container, false);
 
-        ChatNode currentChatNodes = realm.where(ChatNode.class)
-                .beginsWith("contact", contactName)
-                .findFirst();
-        recyclerView = rootView.findViewById(R.id.contact_list);
-        assert recyclerView != null;
-        RealmList<ChatBox> allChatNodes = currentChatNodes.getChatBox();
 
-        setupRecyclerView((RecyclerView) recyclerView, allChatNodes);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.contact_list);
+        assert recyclerView != null;
+        final EditText msg_edittext = (EditText) rootView.findViewById(R.id.messageEditText);
+        final ImageButton sendButton = (ImageButton) rootView.findViewById(R.id.sendMessageButton);
+
+
+        setupRecyclerView(recyclerView, allChatNodes);
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = msg_edittext.getEditableText().toString();
+                if (!message.equalsIgnoreCase("")) {
+                    final ChatBox chatMessage = new ChatBox();
+                    chatMessage.setSpeaker("Me");
+                    chatMessage.setMessage(message);
+                    chatMessage.setTimeSent(QueryUtils.getCurrentDate());
+                    msg_edittext.setText("");
+
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            currentChatNodes.getChatBox().add(chatMessage);
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+
+
+                    final long changeTime = 5000L;
+
+                    sendButton.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            realm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    currentChatNodes.getChatBox().add(senderOnlyNodes.get(0));
+                                    adapter.notifyDataSetChanged();
+                                    recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+
+                                }
+                            });
+
+                        }
+                    }, changeTime);
+
+                    // Scroll to the end
+                    recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+
+
+                }
+            }
+        });
+
 
         return rootView;
     }
